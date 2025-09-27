@@ -1,0 +1,42 @@
+{
+  "expo": {
+    "name": "EggApp",
+    "slug": "EggApp",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/eggCursor.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.victor.eggapp",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.victor.eggapp",
+      "edgeToEdgeEnabled": true
+    },
+    "web": {
+      "favicon": "./assets/eggCursor.png"
+    },
+    "plugins": [
+      "expo-font"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "cdd47fbf-c8ba-400a-8b4e-886a3ef3bd7c"
+      }
+    }
+  }
+}
