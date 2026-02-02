@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, Button, StyleSheet, ImageBackground, Image, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ImageBackground, Image, TouchableOpacity } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import { useLanguage } from '../context/LanguageContext';
@@ -13,11 +13,6 @@ export default function Timer({ route, navigation }) {
     const [animacaoCrescente, setAnimacaoCrescente] = useState(true);
     const { language } = useLanguage();
     const { playClickSound, playClockSound, stopClockSound, soundsLoaded } = useSound();
-
-    // Refs para controlar os toques
-    const tapCount = useRef(0);
-    const tapTimer = useRef(null);
-    const longPressTimer = useRef(null);
 
     const images = [
         require('../assets/open_egg1.png'),
@@ -56,62 +51,10 @@ export default function Timer({ route, navigation }) {
         });
     };
 
-    // Função para iniciar/pausar o cronômetro
-    const startPauseTimer = () => {
-        setIsRunning(!isRunning);
-    };
-
-    // Função para resetar o cronômetro
-    const resetTimer = () => {
-        playClickSound(); // Toca som ao resetar
-        setRemainingTime(time * 60);
-        setIsRunning(true);
-        setCurrentImageIndex(0);
-        setAnimacaoCrescente(true);
-    };
-
     // Função para voltar à tela anterior
     const goBackToEggPreparation = () => {
         playClickSound(); // Toca som ao voltar
         navigation.navigate('EggPreparation');
-    };
-
-    // Função para lidar com o início do toque (onPressIn)
-    const handlePressIn = () => {
-        // Inicia o timer para long press
-        longPressTimer.current = setTimeout(() => {
-            // Long press detectado - volta para EggPreparation
-            goBackToEggPreparation();
-        }, 800); // 800ms para long press
-    };
-
-    // Função para lidar com o fim do toque (onPressOut)
-    const handlePressOut = () => {
-        // Cancela o long press timer
-        if (longPressTimer.current) {
-            clearTimeout(longPressTimer.current);
-            longPressTimer.current = null;
-        }
-
-        // Incrementa o contador de toques
-        tapCount.current += 1;
-
-        if (tapCount.current === 1) {
-            // Primeiro toque - inicia timer para detectar double tap
-            tapTimer.current = setTimeout(() => {
-                // Single tap - pausa/resume o timer
-                startPauseTimer();
-                tapCount.current = 0;
-            }, 300); // 300ms para detectar double tap
-        } else if (tapCount.current === 2) {
-            // Double tap detectado - reseta o timer
-            if (tapTimer.current) {
-                clearTimeout(tapTimer.current);
-                tapTimer.current = null;
-            }
-            resetTimer();
-            tapCount.current = 0;
-        }
     };
 
     // Effect para controlar o som quando pausa/despausa
@@ -180,28 +123,22 @@ export default function Timer({ route, navigation }) {
         return () => clearInterval(animationTimer);
     }, [isRunning, remainingTime, animacaoCrescente]);
 
-    // Limpeza dos timers quando o componente é desmontado
+    // Limpeza quando o componente é desmontado
     useEffect(() => {
         return () => {
-            if (tapTimer.current) {
-                clearTimeout(tapTimer.current);
-            }
-            if (longPressTimer.current) {
-                clearTimeout(longPressTimer.current);
-            }
             // Para o som quando sair da tela
             stopClockSound();
         };
     }, []);
 
-    // Função para obter o texto das instruções
-    const getInstructionsText = () => {
+    // Função para obter o texto do botão de voltar
+    const getBackButtonText = () => {
         if (language === 'pt') {
-            return '1 toque: pausar • 2 toques: resetar • Toque longo: voltar';
+            return 'Voltar';
         } else if (language === 'en') {
-            return '1 tap: pause • 2 taps: reset • Long press: back';
+            return 'Back';
         } else {
-            return '1 tocco: pausa • 2 tocchi: reset • Pressione lungo: indietro';
+            return 'Indietro';
         }
     };
 
@@ -216,16 +153,6 @@ export default function Timer({ route, navigation }) {
         }
     };
 
-    // Função para obter o texto do botão
-    const getButtonText = () => {
-        if (language === 'pt') {
-            return 'Resetar';
-        } else if (language === 'en') {
-            return 'Reset';
-        } else {
-            return 'Reset';
-        }
-    };
 
     return (
         <SafeAreaProvider>
@@ -235,38 +162,31 @@ export default function Timer({ route, navigation }) {
                     style={styles.background}
                     resizeMode="cover"
                 >
+                    {/* Botão de voltar no canto superior esquerdo */}
+                    <TouchableOpacity
+                        onPress={goBackToEggPreparation}
+                        style={styles.backButton}
+                        activeOpacity={0.8}
+                    >
+                        <Text style={styles.backButtonText}>
+                            {getBackButtonText()}
+                        </Text>
+                    </TouchableOpacity>
+
                     <View style={styles.container}>
                         <Text style={[styles.heading, { fontFamily: 'PressStart2P' }]}>
                             {getHeadingText()}
                         </Text>
 
-                        <TouchableOpacity
-                            onPressIn={handlePressIn}
-                            onPressOut={handlePressOut}
-                            activeOpacity={0.8}
-                        >
-                            <View style={styles.imageContainer}>
-                                <Image
-                                    source={images[currentImageIndex]}
-                                    style={styles.image}
-                                    resizeMode="contain"
-                                />
-                            </View>
-                        </TouchableOpacity>
+                        <View style={styles.imageContainer}>
+                            <Image
+                                source={images[currentImageIndex]}
+                                style={styles.image}
+                                resizeMode="contain"
+                            />
+                        </View>
 
                         <Text style={styles.bottom}>{formatTime(remainingTime)}</Text>
-{/* 
-                        <Text style={styles.instructions}>
-                            {getInstructionsText()}
-                        </Text>
-
-                        <View style={styles.buttonContainer}>
-                            <View style={styles.buttonSpacing} />
-                            <Button
-                                title={getButtonText()}
-                                onPress={resetTimer}
-                            />
-                        </View> */}
                     </View>
                 </ImageBackground>
             </SafeAreaView>
@@ -277,13 +197,39 @@ export default function Timer({ route, navigation }) {
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        backgroundColor: '#E6B3FF', // Cor de fundo que combina com sua paleta
+        backgroundColor: '#E6B3FF',
     },
     background: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
         width: '100%',
+    },
+    backButton: {
+        position: 'absolute',
+        top: 20,
+        left: 20,
+        backgroundColor: '#ffffeb',
+        paddingVertical: 12,
+        paddingHorizontal: 20,
+        borderRadius: 25,
+        borderWidth: 3,
+        borderColor: '#eed6fa',
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+        zIndex: 10,
+    },
+    backButtonText: {
+        fontSize: 12,
+        color: '#ffd900',
+        fontFamily: 'PressStart2P',
+        fontWeight: 'bold',
     },
     container: {
         flex: 1,
@@ -294,7 +240,7 @@ const styles = StyleSheet.create({
         paddingBottom: 40,
     },
     heading: {
-        fontSize: 32, // Reduzido para caber melhor
+        fontSize: 32,
         fontWeight: 'bold',
         marginBottom: 40,
         textAlign: 'center',
@@ -302,7 +248,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
     },
     bottom: {
-        fontSize: 60, // Reduzido para caber melhor
+        fontSize: 60,
         fontWeight: 'bold',
         marginBottom: 20,
         textAlign: 'center',
@@ -323,21 +269,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     image: {
-        width: 160, // Reduzido ligeiramente
+        width: 160,
         height: 160,
-    },
-    instructions: {
-        fontSize: 11,
-        color: '#666',
-        textAlign: 'center',
-        marginBottom: 10,
-        paddingHorizontal: 20,
-    },
-    buttonContainer: {
-        flexDirection: 'row',
-        marginTop: 15,
-    },
-    buttonSpacing: {
-        width: 20,
     },
 });
