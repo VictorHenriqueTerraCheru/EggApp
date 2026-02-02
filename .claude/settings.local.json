@@ -4,7 +4,10 @@
       "Bash(npx expo export:*)",
       "Bash(npm ls:*)",
       "Bash(del /f \"C:\\\\Users\\\\victo\\\\source\\\\repos\\\\EggApp\\\\webpack.config.js\")",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(magick:*)",
+      "Bash(convert:*)",
+      "Bash(npx sharp-cli:*)"
     ]
   }
 }

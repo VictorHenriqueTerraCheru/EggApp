@@ -30,7 +30,12 @@
     "web": {
       "favicon": "./assets/eggCursor.png",
       "bundler": "metro",
-      "output": "single"
+      "output": "single",
+      "name": "EggTimer",
+      "shortName": "EggTimer",
+      "description": "Timer para cozinhar ovos no ponto certo",
+      "themeColor": "#E6B3FF",
+      "backgroundColor": "#E6B3FF"
     },
     "plugins": [
       "expo-font"
