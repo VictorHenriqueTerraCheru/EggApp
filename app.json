@@ -28,7 +28,9 @@
       "edgeToEdgeEnabled": true
     },
     "web": {
-      "favicon": "./assets/eggCursor.png"
+      "favicon": "./assets/eggCursor.png",
+      "bundler": "metro",
+      "output": "single"
     },
     "plugins": [
       "expo-font"

@@ -6,7 +6,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { useSound } from '../hooks/useSound';
 
 export default function Timer({ route, navigation }) {
-    const { time } = route.params;
+    const { time = 6 } = route.params || {};
     const [remainingTime, setRemainingTime] = useState(time * 60);
     const [isRunning, setIsRunning] = useState(true);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
